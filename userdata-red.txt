@@ -1,0 +1,28 @@
+#!/bin/bash -x
+
+# The following is the line that redirects the user-data output:
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
+# update packages and install nginx and git
+sudo yum update
+sudo amazon-linux-extras install nginx1
+sudo yum install git -y
+
+# set aws credentials to access s3
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+
+# download html file from s3 ( save it here /usr/share/nginx/new-html/red/)
+sudo mkdir -p /usr/share/nginx/new-html/red
+sudo -E sh -c 'aws s3 cp s3://zivhtmlbucket/red/index.html /usr/share/nginx/new-html/red/'
+
+# clone git repository to access my nginx.conf file
+git clone https://github.com/zivlederer/directeam.git /~/directscript/
+cd /~/directscript/
+
+# override /etc/nginx/nginx.conf with my nginx.conf to host this new index file
+cp ./red/nginx.conf /etc/nginx/nginx.conf
+
+# restart nginx
+sudo systemctl restart nginx
+

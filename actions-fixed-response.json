@@ -1,0 +1,10 @@
+[
+  {
+      "Type": "fixed-response",
+      "FixedResponseConfig": {
+          "StatusCode": "503",
+          "ContentType": "text/plain",
+          "MessageBody": "try /red or /blue"
+      }
+  }
+]
